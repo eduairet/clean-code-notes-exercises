@@ -19,4 +19,4 @@ jobs:
       - name: Push the Docker image
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/clean-code-notes-exercises
       - name: Run the Docker image
-        run: docker run -rm  ${{ secrets.DOCKER_HUB_USERNAME }}/clean-code-notes-exercises
+        run: docker run --rm  ${{ secrets.DOCKER_HUB_USERNAME }}/clean-code-notes-exercises
