@@ -1,0 +1,22 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['master']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+      - name: Build the Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/clean-code-notes-exercises:lastest .
+      - name: Push the Docker image
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/clean-code-notes-exercises:latest
+      - name: Run the Docker image
+        run: docker run -rm  ${{ secrets.DOCKER_HUB_USERNAME }}/clean-code-notes-exercises:latest
