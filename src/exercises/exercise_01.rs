@@ -73,13 +73,13 @@ impl Bounds {
 /// ```
 /// use clean_code_notes_exercises::exercises::exercise_01::{Point, Rectangle};
 ///
-/// let starting_point = Point::new(0.0, 0.0);
-/// let rectangle = Rectangle::new(starting_point, 2.0, 3.0);
+/// let origin = Point::new(0.0, 0.0);
+/// let rectangle = Rectangle::new(origin, 2.0, 3.0);
 ///
 /// assert_eq!(rectangle.width, 2.0);
 /// assert_eq!(rectangle.height, 3.0);
-/// assert_eq!(rectangle.area(), 6.0);
-/// assert_eq!(rectangle.perimeter(), 10.0);
+/// assert_eq!(rectangle.get_area(), 6.0);
+/// assert_eq!(rectangle.get_perimeter(), 10.0);
 /// ```
 pub struct Rectangle {
     pub width: f64,
@@ -88,11 +88,11 @@ pub struct Rectangle {
 }
 
 impl Rectangle {
-    pub fn new(starting_point: Point, width: f64, height: f64) -> Rectangle {
-        let bottom_left = starting_point.clone();
-        let top_right = Point::new(starting_point.x + width, starting_point.y + height);
-        let top_left = Point::new(starting_point.x, starting_point.y + height);
-        let bottom_right = Point::new(starting_point.x + width, starting_point.y);
+    pub fn new(origin: Point, width: f64, height: f64) -> Rectangle {
+        let bottom_left = origin.clone();
+        let top_right = Point::new(origin.x + width, origin.y + height);
+        let top_left = Point::new(origin.x, origin.y + height);
+        let bottom_right = Point::new(origin.x + width, origin.y);
 
         let bounds = Bounds::new(top_left, top_right, bottom_right, bottom_left);
 
@@ -103,22 +103,47 @@ impl Rectangle {
         }
     }
 
-    pub fn area(&self) -> f64 {
+    pub fn get_area(&self) -> f64 {
         self.width * self.height
     }
 
-    pub fn perimeter(&self) -> f64 {
+    pub fn get_perimeter(&self) -> f64 {
         2.0 * (self.width + self.height)
     }
 
-    pub fn print(&self) {
+    pub fn print_coordinates(&self) {
         println!(
-            "Starting Point: ({}, {})",
-            self.bounds.bottom_left.x, self.bounds.bottom_left.y
+            "Top Left: ({}, {})",
+            self.bounds.top_left.x, self.bounds.top_left.y
         );
         println!(
-            "Ending Point: ({}, {})",
+            "Top Right: ({}, {})",
             self.bounds.top_right.x, self.bounds.top_right.y
         );
+        println!(
+            "Bottom Right: ({}, {})",
+            self.bounds.bottom_right.x, self.bounds.bottom_right.y
+        );
+        println!(
+            "Bottom Left: ({}, {})",
+            self.bounds.bottom_left.x, self.bounds.bottom_left.y
+        );
     }
+}
+
+/// Builds a square with the given origin and side
+///
+/// # Examples
+///
+/// ```
+/// use clean_code_notes_exercises::exercises::exercise_01::{Point, Rectangle, build_square};
+///
+/// let origin = Point::new(0.0, 0.0);
+/// let square = build_square(origin, 2.0);
+///
+/// assert_eq!(square.width, 2.0);
+/// assert_eq!(square.height, 2.0);
+/// ```
+pub fn build_square(origin: Point, side: f64) -> Rectangle {
+    Rectangle::new(origin, side, side)
 }
