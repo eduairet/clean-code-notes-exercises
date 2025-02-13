@@ -6,6 +6,7 @@ Notes and examples of Clean Code.
 
 1. [Introduction](./_notes/introduction.md)
 2. [Naming - Assigning Names to Variables, Functions, Classes & More](./_notes/naming.md)
+3. [Functions & Methods](./_notes/functions.md)
 
 ## References
 
