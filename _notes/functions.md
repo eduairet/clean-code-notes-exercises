@@ -57,7 +57,7 @@
   user.add_id();
   ```
 
-- Functions should be small and do one thing, if a function is too long, it should be split into smaller functions
+- Functions should be small and do one thing, if a function is too long, it should be split into smaller functions, this is called the Single Responsibility Principle and it consists in add levels of abstraction to the code
 
   ```RUST
   fn validate_user(user: User) -> Result<User, String> {
@@ -80,3 +80,5 @@
       Ok(user)
   }
   ```
+
+  - Knowing when to split a function is a matter of experience, but a good rule of thumb is to keep everything just one level of abstraction below the stated name of the function, in the example above, the `login_user` function is responsible for logging in a user, so it should not be responsible for validating the user, that's why the `validate_user` function was created
