@@ -11,6 +11,7 @@ use regex::Regex;
 /// assert_eq!(user.username, "username");
 /// assert_eq!(user.email, "test@test.com");
 /// assert_eq!(user.password, "password");
+/// user.save();
 /// ```
 #[derive(Debug)]
 pub struct User {
@@ -26,6 +27,10 @@ impl User {
             email,
             password,
         }
+    }
+
+    pub fn save(&self) -> () {
+        println!("User saved: {:?}", self);
     }
 }
 
@@ -84,106 +89,61 @@ pub fn create_user(
     email: String,
     password: String,
 ) -> Result<(), CreateUserError> {
-    validate_user_data(&username, &email, &password)?;
-    Ok(save_user(User::new(username, email, password)))
+    Validate::user_data(&username, &email, &password)?;
+    let new_user = User::new(username, email, password);
+    Ok(new_user.save())
 }
 
-/// Is username valid function
+/// This struct contains validation functions for different inputs
 ///
 /// # Examples
 ///
 /// ```
-/// use clean_code_notes_exercises::exercises::exercise_02::{is_username_valid};
+/// use clean_code_notes_exercises::exercises::exercise_02::Validate;
 ///
-/// let username = "username";
-/// let result = is_username_valid(username);
-/// assert_eq!(result, true);
+/// assert_eq!(Validate::password("password"), true);
+/// assert_eq!(Validate::password("pass"), false);
+/// assert_eq!(Validate::username("12345"), true);
+/// assert_eq!(Validate::username("123 43"), false);
+/// assert_eq!(Validate::email("test@test"), false);
+/// assert_eq!(Validate::email("test@test.com"), true);
+/// assert_eq!(Validate::user_data("username", "test@test.com", "password").is_ok(), true);
+/// assert_eq!(Validate::user_data("username", "test@test", "password").is_err(), true);
 /// ```
-pub fn is_username_valid(username: &str) -> bool {
-    let username_pattern = Regex::new(r"^[A-Za-z\d_]+$").unwrap();
-    username_pattern.is_match(username)
-}
+pub struct Validate;
 
-/// Is email valid function
-///
-/// # Examples
-///
-/// ```
-/// use clean_code_notes_exercises::exercises::exercise_02::{is_email_valid};
-///
-/// let email = "test@test.com";
-/// let result = is_email_valid(email);
-/// assert_eq!(result, true);
-/// ```
-pub fn is_email_valid(email: &str) -> bool {
-    let email_pattern = Regex::new(r"^[A-Za-z\d_]+@[A-Za-z\d_]+\.[A-Za-z\d_]+$").unwrap();
-    email_pattern.is_match(email)
-}
-
-/// Is password valid function
-///
-/// # Examples
-///
-/// ```
-/// use clean_code_notes_exercises::exercises::exercise_02::{is_password_valid};
-///
-/// let password = "password";
-/// let result = is_password_valid(password);
-/// assert_eq!(result, true);
-/// ```
-pub fn is_password_valid(password: &str) -> bool {
-    let password_pattern = Regex::new(r"^[A-Za-z\d_]{5,}$").unwrap();
-    password_pattern.is_match(password)
-}
-
-/// Is user data valid function
-///
-/// # Examples
-///
-/// ```
-/// use clean_code_notes_exercises::exercises::exercise_02::{validate_user_data, CreateUserError};
-///
-/// let username = "username";
-/// let email = "test@test.com";
-/// let password = "password";
-///
-/// let result = validate_user_data(username, email, password);
-/// assert_eq!(result.is_ok(), true);
-/// ```
-pub fn validate_user_data(
-    username: &str,
-    email: &str,
-    password: &str,
-) -> Result<(), CreateUserError> {
-    let mut errors = vec![];
-
-    if !is_username_valid(username) {
-        errors.push(CreateUserError::InvalidUsername);
-    }
-    if !is_email_valid(email) {
-        errors.push(CreateUserError::InvalidEmail);
-    }
-    if !is_password_valid(password) {
-        errors.push(CreateUserError::InvalidPassword);
+impl Validate {
+    pub fn username(input: &str) -> bool {
+        Regex::new(r"^[A-Za-z\d_]{5,}$").unwrap().is_match(input)
     }
 
-    match errors.len() {
-        0 => Ok(()),
-        1 => Err(errors[0].clone()),
-        _ => Err(CreateUserError::InvalidUserData),
+    pub fn email(input: &str) -> bool {
+        Regex::new(r"^[A-Za-z\d_]+@[A-Za-z\d_]+\.[A-Za-z\d_]+$")
+            .unwrap()
+            .is_match(input)
     }
-}
 
-/// Save user function
-///
-/// # Examples
-///
-/// ```
-/// use clean_code_notes_exercises::exercises::exercise_02::{save_user, User};
-///
-/// let user = User::new("username".to_string(), "test@test.com".to_string(), "password".to_string());
-/// save_user(user);
-/// ```
-pub fn save_user(user: User) -> () {
-    println!("User saved: {:?}", user);
+    pub fn password(input: &str) -> bool {
+        Regex::new(r"^[A-Za-z\d_]{5,}$").unwrap().is_match(input)
+    }
+
+    pub fn user_data(username: &str, email: &str, password: &str) -> Result<(), CreateUserError> {
+        let mut errors = vec![];
+
+        if !Validate::username(username) {
+            errors.push(CreateUserError::InvalidUsername);
+        }
+        if !Validate::email(email) {
+            errors.push(CreateUserError::InvalidEmail);
+        }
+        if !Validate::password(password) {
+            errors.push(CreateUserError::InvalidPassword);
+        }
+
+        match errors.len() {
+            0 => Ok(()),
+            1 => Err(errors[0].clone()),
+            _ => Err(CreateUserError::InvalidUserData),
+        }
+    }
 }

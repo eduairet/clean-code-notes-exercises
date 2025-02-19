@@ -82,3 +82,52 @@
   ```
 
   - Knowing when to split a function is a matter of experience, but a good rule of thumb is to keep everything just one level of abstraction below the stated name of the function, in the example above, the `login_user` function is responsible for logging in a user, so it should not be responsible for validating the user, that's why the `validate_user` function was created
+
+- Functions are a great way to follow the DRY (Don't Repeat Yourself) principle, if you find yourself repeating code, you should create a function to avoid updating the same code in multiple places
+  - If you're unsure if you should create a function, you can ask yourself if by splitting the code into a new function, you're making the code more readable and easier to understand or if it's just adding complexity
+
+## Side Effects
+
+- Pure functions are functions that don't have side effects and always return the same output for the same input
+- Impure functions are functions that have side effects and can return different outputs for the same input
+  - For example a function that creates a random number is impure since it can return different outputs for the same input
+- Functions should not have side effects, a function should only return a value and not modify any external state
+
+  ```RUST
+  // Not ideal since the function modifies the user
+  fn add_id(user: &mut User) {
+      user.id = 1;
+  }
+
+  // Better: The function implies that the user is modified
+  fn add_id(user: &User) -> User {
+      User { id: 1, ..user }
+  }
+
+  // Great: The function implies that the user is modified
+  let user = User { name: "John" };
+  user.add_id();
+  ```
+
+  - If you need a function that has side effects, you should make it clear in the function name
+
+- Side effects make the code harder to reason about and test, since you need to know the state of the system before calling the function
+- Most of the time we won't need to modify the state of the system through functions, we can use objects to handle the state and modify it through methods
+- A good example of side effects is handling errors, if a function can return an error, it should return a Result type instead of throwing an exception
+
+  ```RUST
+  fn divide(a: i32, b: i32) -> Result<i32, String> {
+      if b == 0 {
+          return Err("Cannot divide by zero".to_string());
+      }
+      Ok(a / b)
+  }
+
+  let result = divide(10, 0);
+  match result {
+      Ok(value) => println!("Result: {}", value),
+      Err(error) => println!("Error: {}", error),
+  }
+  ```
+
+- Another way to keep clean functions is by unit testing them, if a function is hard to test, it's a sign that the function is doing too much and should be split into smaller functions
