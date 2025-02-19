@@ -1,5 +1,4 @@
 /// Eduardo Aire Torres - <eduardo.aire.torres@gmail>
-/// MIT License 2025
 use std::io::Write;
 
 /// DiskStorage struct
@@ -10,6 +9,7 @@ use std::io::Write;
 /// use clean_code_notes_exercises::exercises::exercise_02::DiskStorage;
 ///
 /// let log_storage = DiskStorage::new("logs");
+///
 /// log_storage.create_directory();
 /// log_storage.insert_file("test.txt", "Test");
 /// ```
@@ -29,9 +29,6 @@ impl DiskStorage {
         std::path::Path::new(&self.storage_directory).to_path_buf()
     }
 
-    /// # Note
-    ///
-    /// Directory must exist in advance
     pub fn create_directory(&self) -> std::io::Result<()> {
         if !self.get_directory_path().exists() {
             std::fs::create_dir_all(&self.storage_directory)?;
@@ -39,10 +36,14 @@ impl DiskStorage {
         Ok(())
     }
 
+    /// # Warning
+    ///
+    /// Directory must exist in advance
     pub fn insert_file(&self, file_name: &str, content: &str) -> std::io::Result<()> {
         let file_path = self.get_directory_path().join(file_name);
         let mut file = std::fs::File::create(file_path)?;
         file.write_all(content.as_bytes())?;
+        // TODO: Add error handling
         Ok(())
     }
 }
