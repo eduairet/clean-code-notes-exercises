@@ -6,12 +6,15 @@ Notes and examples of Clean Code.
 
 1. [Introduction](./_notes/introduction.md)
 2. [Naming - Assigning Names to Variables, Functions, Classes & More](./_notes/naming.md)
-3. [Functions & Methods](./_notes/functions.md)
+3. [Code Structure, Comments & Formatting](./_notes/comments.md)
+4. [Functions & Methods](./_notes/functions.md)
+5. [Control Structures & Errors](./_notes/control_structures.md)
 
 ## Exercises
 
-1. [Exercise 1](./src/exercises/exercise_01.rs)
-2. [Exercise 2](./src/exercises/exercise_02.rs)
+1. [Exercise 1 - Naming](./src/exercises/exercise_01.rs)
+1. [Exercise 2 - Formatting](./src/exercises/exercise_03.rs)
+1. [Exercise 3 - Functions](./src/exercises/exercise_03.rs)
 
 ## References
 
