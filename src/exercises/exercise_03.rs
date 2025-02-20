@@ -67,8 +67,6 @@ impl std::fmt::Display for CreateUserError {
     }
 }
 
-impl std::error::Error for CreateUserError {}
-
 /// Create user function
 ///
 /// # Examples

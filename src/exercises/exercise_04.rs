@@ -8,7 +8,7 @@
 /// assert_eq!(format!("{}", TransactionType::Payment), "payment");
 /// assert_eq!(format!("{}", TransactionType::Refund), "refund");
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TransactionType {
     Payment,
     Refund,
@@ -33,7 +33,7 @@ impl std::fmt::Display for TransactionType {
 /// assert_eq!(format!("{}", TransactionStatus::Open), "open");
 /// assert_eq!(format!("{}", TransactionStatus::Closed), "closed");
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TransactionStatus {
     Open,
     Closed,
@@ -59,7 +59,7 @@ impl std::fmt::Display for TransactionStatus {
 /// assert_eq!(format!("{}", PaymentMethod::PayPal), "PayPal");
 /// assert_eq!(format!("{}", PaymentMethod::Plan), "plan");
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum PaymentMethod {
     CreditCard,
     PayPal,
@@ -81,25 +81,67 @@ impl std::fmt::Display for PaymentMethod {
 /// # Examples
 ///
 /// ```
-/// use clean_code_notes_exercises::exercises::exercise_04::TransactionError;
+/// use clean_code_notes_exercises::exercises::exercise_04::*;
+/// use clean_code_notes_exercises::transaction_closed_error;
 ///
 /// assert_eq!(format!("{}", TransactionError::Empty), "There are no transactions to process");
-/// assert_eq!(format!("{}", TransactionError::PaymentClosed), "Your payment is already closed");
-/// assert_eq!(format!("{}", TransactionError::RefundClosed), "Your refund is already closed");
+/// assert_eq!(format!("{}", TransactionError::Closed(None)), "Your transaction is already closed");
+/// assert_eq!(format!("{}", transaction_closed_error!()), "Your transaction is already closed");
+///
+/// let payment_transaction = Transaction::new(
+///   String::from("t1"),
+///   TransactionType::Payment,
+///   TransactionStatus::Closed,
+///   PaymentMethod::CreditCard,
+///   23.99,
+/// );
+///
+/// let payment_expected_error = TransactionError::Closed(Some(payment_transaction.clone()));
+///
+/// assert_eq!(format!("{}", payment_expected_error), "Your payment is already closed | Transaction: id: t1, type: payment, status: closed, method: credit card, amount: 23.99");
+///
+/// let refund_transaction = Transaction::new(
+///   String::from("t2"),
+///   TransactionType::Refund,
+///   TransactionStatus::Closed,
+///   PaymentMethod::PayPal,
+///   100.43,
+/// );
+///
+/// let refund_expected_error = TransactionError::Closed(Some(refund_transaction.clone()));
+///
+/// assert_eq!(format!("{}", payment_expected_error), "Your payment is already closed | Transaction: id: t1, type: payment, status: closed, method: credit card, amount: 23.99");
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub enum TransactionError {
     Empty,
-    PaymentClosed,
-    RefundClosed,
+    Closed(Option<Transaction>),
+}
+
+#[macro_export]
+macro_rules! transaction_closed_error {
+    () => {
+        TransactionError::Closed(None)
+    };
+    ($transaction:expr) => {
+        TransactionError::Closed(Some($transaction))
+    };
 }
 
 impl std::fmt::Display for TransactionError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             TransactionError::Empty => write!(f, "There are no transactions to process"),
-            TransactionError::PaymentClosed => write!(f, "Your payment is already closed"),
-            TransactionError::RefundClosed => write!(f, "Your refund is already closed"),
+            TransactionError::Closed(transaction) => {
+                write!(
+                    f,
+                    "{}",
+                    match transaction {
+                        Some(t) => format!("Your {} is already closed | {}", t.transaction_type, t),
+                        None => "Your transaction is already closed".to_string(),
+                    }
+                )
+            }
         }
     }
 }
@@ -135,8 +177,10 @@ impl std::fmt::Display for TransactionError {
 ///   100.43,
 /// );
 ///
-/// assert_eq!(closed_transaction.process(), Err(TransactionError::PaymentClosed));
+/// assert_eq!(closed_transaction.process(), Err(TransactionError::Closed(Some(closed_transaction.clone()))));
+/// assert_eq!(format!("{}", transaction), "Transaction: id: t1, type: payment, status: open, method: credit card, amount: 23.99");
 /// ```
+#[derive(Debug, Clone, PartialEq)]
 pub struct Transaction {
     pub id: String,
     pub transaction_type: TransactionType,
@@ -162,18 +206,59 @@ impl Transaction {
         }
     }
 
-    pub fn process(&self) -> Result<String, TransactionError> {
-        if self.status == TransactionStatus::Closed {
-            return match self.transaction_type {
-                TransactionType::Payment => Err(TransactionError::PaymentClosed),
-                TransactionType::Refund => Err(TransactionError::RefundClosed),
-            };
-        };
-
-        Ok(format!(
-            "Processing {} {} for amount: {}",
+    fn get_processor(&self) -> String {
+        format!(
+            "Processing {} {} for amount: {:.2}",
             self.transaction_type, self.method, self.amount
-        ))
+        )
+    }
+
+    pub fn process(&self) -> Result<String, TransactionError> {
+        match self.status {
+            TransactionStatus::Closed => {
+                return Err(TransactionError::Closed(Some(self.clone())));
+            }
+            TransactionStatus::Open => Ok(self.get_processor()),
+        }
+    }
+}
+
+impl std::fmt::Display for Transaction {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Transaction: id: {}, type: {}, status: {}, method: {}, amount: {}",
+            self.id, self.transaction_type, self.status, self.method, self.amount
+        )
+    }
+}
+
+/// Validates a list of transactions.
+///
+/// # Example
+///
+/// ```
+/// use clean_code_notes_exercises::exercises::exercise_04::*;
+///
+/// let transactions = vec![
+///    Transaction {
+///       id: String::from("t1"),
+///       transaction_type: TransactionType::Payment,
+///       status: TransactionStatus::Open,
+///       method: PaymentMethod::CreditCard,
+///       amount: 23.99,
+///   },
+/// ];
+///
+/// assert_eq!(validate_transactions(&transactions), Ok(()));
+///
+/// let empty_transactions: Vec<Transaction> = vec![];
+/// assert_eq!(validate_transactions(&empty_transactions), Err(TransactionError::Empty));
+/// ```
+pub fn validate_transactions(transactions: &Vec<Transaction>) -> Result<(), TransactionError> {
+    match transactions.is_empty() {
+        true => Err(TransactionError::Empty),
+        false => Ok(()),
     }
 }
 
@@ -195,20 +280,6 @@ impl Transaction {
 ///     Transaction {
 ///         id: String::from("t2"),
 ///         transaction_type: TransactionType::Payment,
-///         status: TransactionStatus::Open,
-///         method: PaymentMethod::PayPal,
-///         amount: 100.43,
-///     },
-///     Transaction {
-///         id: String::from("t3"),
-///         transaction_type: TransactionType::Refund,
-///         status: TransactionStatus::Open,
-///         method: PaymentMethod::CreditCard,
-///         amount: 10.99,
-///     },
-///     Transaction {
-///         id: String::from("t4"),
-///         transaction_type: TransactionType::Payment,
 ///         status: TransactionStatus::Closed,
 ///         method: PaymentMethod::Plan,
 ///         amount: 15.99,
@@ -217,9 +288,7 @@ impl Transaction {
 ///
 /// let expected = vec![
 ///    "Processing payment credit card for amount: 23.99".to_string(),
-///    "Processing payment PayPal for amount: 100.43".to_string(),
-///    "Processing refund credit card for amount: 10.99".to_string(),
-///    "Your payment is already closed".to_string(),
+///    "Your payment is already closed | Transaction: id: t2, type: payment, status: closed, method: plan, amount: 15.99".to_string(),
 /// ];
 ///
 /// assert_eq!(process_transactions(&transactions), Ok(expected));
@@ -230,9 +299,7 @@ impl Transaction {
 pub fn process_transactions(
     transactions: &Vec<Transaction>,
 ) -> Result<Vec<String>, TransactionError> {
-    if transactions.is_empty() {
-        return Err(TransactionError::Empty);
-    }
+    validate_transactions(transactions)?;
 
     let results: Vec<String> = transactions
         .iter()
