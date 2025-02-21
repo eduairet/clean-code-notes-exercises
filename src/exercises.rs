@@ -6,3 +6,5 @@ pub mod exercise_03;
 pub use exercise_03::*;
 pub mod exercise_04;
 pub use exercise_04::*;
+pub mod exercise_05;
+pub use exercise_05::*;
