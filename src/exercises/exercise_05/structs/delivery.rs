@@ -1,57 +1,119 @@
-use crate::exercises::{delivery_type::DeliveryType, purchase::Purchase};
+use crate::exercises::{delivery_type::DeliveryType, DeliveryAction};
+
+pub trait DeliveryTrait {
+    fn deliver_product(&self) -> String;
+    fn track_product(&self) -> String;
+}
 
 /// A delivery struct.
 ///
 /// # Example
 ///
 /// ```
-/// use clean_code_notes_exercises::exercises::{delivery::Delivery, delivery_type::DeliveryType, purchase::Purchase};
+/// use clean_code_notes_exercises::exercises::Delivery::Delivery;
 ///
-/// let purchase = Purchase {
-///    product: "A product".to_string(),
-///    delivery_type: DeliveryType::Express,
-/// };
-///
-/// let delivery = Delivery::new(purchase);
-///
-/// delivery.deliver_product();
-/// delivery.track_product();
+/// let delivery = Delivery::new("A product".to_string());
+/// assert_eq!(delivery.product, "A product");
 /// ```
 #[derive(Debug)]
 pub struct Delivery {
-    purchase: Purchase,
+    pub product: String,
 }
 
 impl Delivery {
-    pub fn new(purchase: Purchase) -> Self {
-        Self { purchase }
+    pub fn new(product: String) -> Self {
+        Self { product }
+    }
+}
+
+/// A delivery struct for express delivery.
+///
+/// # Example
+/// ```
+/// use clean_code_notes_exercises::exercises::Delivery::{Delivery, DeliveryExpress, DeliveryTrait};
+/// use clean_code_notes_exercises::exercises::delivery_type::DeliveryType;
+/// use clean_code_notes_exercises::exercises::DeliveryAction;
+///
+/// let delivery = Delivery::new("A product".to_string());
+/// let delivery_express = DeliveryExpress { base: delivery };
+///
+/// let result = delivery_express.deliver_product();
+/// assert_eq!(result, "Issuing express delivery for A product");
+/// ```
+pub struct DeliveryExpress {
+    pub base: Delivery,
+}
+
+impl DeliveryTrait for DeliveryExpress {
+    fn deliver_product(&self) -> String {
+        DeliveryType::Express
+            .get_action_message(DeliveryAction::Issue, self.base.product.to_string())
     }
 
-    pub fn deliver_product(&self) {
-        match self.purchase.delivery_type {
-            DeliveryType::Express => {
-                println!("Issuing express delivery for {}", self.purchase.product)
-            }
-            DeliveryType::Insured => {
-                println!("Issuing insured delivery for {}", self.purchase.product)
-            }
-            DeliveryType::Standard => {
-                println!("Issuing standard delivery for {}", self.purchase.product)
-            }
-        }
+    fn track_product(&self) -> String {
+        DeliveryType::Express
+            .get_action_message(DeliveryAction::Track, self.base.product.to_string())
+    }
+}
+
+/// A delivery struct for insured delivery.
+///
+/// # Example
+///
+/// ```
+/// use clean_code_notes_exercises::exercises::Delivery::{Delivery, DeliveryInsured, DeliveryTrait};
+/// use clean_code_notes_exercises::exercises::delivery_type::DeliveryType;
+/// use clean_code_notes_exercises::exercises::DeliveryAction;
+///
+/// let delivery = Delivery::new("A product".to_string());
+/// let delivery_insured = DeliveryInsured { base: delivery };
+///
+/// let result = delivery_insured.deliver_product();
+/// assert_eq!(result, "Issuing insured delivery for A product");
+/// ```
+pub struct DeliveryInsured {
+    pub base: Delivery,
+}
+
+impl DeliveryTrait for DeliveryInsured {
+    fn deliver_product(&self) -> String {
+        DeliveryType::Insured
+            .get_action_message(DeliveryAction::Issue, self.base.product.to_string())
     }
 
-    pub fn track_product(&self) {
-        match self.purchase.delivery_type {
-            DeliveryType::Express => {
-                println!("Tracking express delivery for {}", self.purchase.product)
-            }
-            DeliveryType::Insured => {
-                println!("Tracking insured delivery for {}", self.purchase.product)
-            }
-            DeliveryType::Standard => {
-                println!("Tracking standard delivery for {}", self.purchase.product)
-            }
-        }
+    fn track_product(&self) -> String {
+        DeliveryType::Insured
+            .get_action_message(DeliveryAction::Track, self.base.product.to_string())
+    }
+}
+
+/// A delivery struct for standard delivery.
+///
+/// # Example
+///
+/// ```
+/// use clean_code_notes_exercises::exercises::Delivery::{Delivery, DeliveryStandard, DeliveryTrait};
+/// use clean_code_notes_exercises::exercises::delivery_type::DeliveryType;
+/// use clean_code_notes_exercises::exercises::DeliveryAction;
+///
+/// let delivery = Delivery::new("A product".to_string());
+/// let delivery_standard = DeliveryStandard { base: delivery };
+///
+/// let result = delivery_standard.deliver_product();
+/// assert_eq!(result, "Issuing standard delivery for A product");
+/// ```
+pub struct DeliveryStandard {
+    pub base: Delivery,
+}
+
+impl DeliveryTrait for DeliveryStandard {
+    fn deliver_product(&self) -> String {
+        DeliveryType::Standard
+            .get_action_message(DeliveryAction::Issue, self.base.product.to_string())
+    }
+
+    fn track_product(&self) -> String {
+        DeliveryType::Standard
+            .get_action_message(DeliveryAction::Track, self.base.product.to_string())
     }
 }
