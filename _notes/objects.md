@@ -62,6 +62,39 @@ db.connect();
 db.disconnect(); // Without clean code, we would have to change this line if we change the disconnect method in every place we use it.
 ```
 
+- Polymorphism is a powerful tool to avoid using if-else statements.
+
+```Rust
+trait Cat {
+    fn sound(&self) -> String;
+}
+
+struct Siamese;
+struct Persian;
+
+impl Cat for Siamese {
+    fn sound(&self) -> String {
+        String::from("Meow")
+    }
+}
+
+impl Cat for Persian {
+    fn sound(&self) -> String {
+        String::from("Purr")
+    }
+}
+
+fn make_sound(cat: &dyn Cat) {
+    println!("{}", cat.sound());
+}
+
+let siamese = Siamese;
+let persian = Persian;
+
+make_sound(&siamese);
+make_sound(&persian);
+```
+
 ### Glossary
 
 - **Concretion**: A concrete object or instance of a class.
