@@ -10,7 +10,7 @@ pub trait DeliveryTrait {
 /// # Example
 ///
 /// ```
-/// use clean_code_notes_exercises::exercises::delivery::Delivery;
+/// use clean_code_notes_exercises::exercises::delivery_structs::Delivery;
 ///
 /// let delivery = Delivery::new("A product".to_string());
 /// assert_eq!(delivery.product, "A product");
@@ -30,7 +30,7 @@ impl Delivery {
 ///
 /// # Example
 /// ```
-/// use clean_code_notes_exercises::exercises::delivery::{Delivery, DeliveryExpress, DeliveryTrait};
+/// use clean_code_notes_exercises::exercises::delivery_structs::{Delivery, DeliveryExpress, DeliveryTrait};
 /// use clean_code_notes_exercises::exercises::delivery_type::DeliveryType;
 /// use clean_code_notes_exercises::exercises::DeliveryAction;
 ///
@@ -61,7 +61,7 @@ impl DeliveryTrait for DeliveryExpress {
 /// # Example
 ///
 /// ```
-/// use clean_code_notes_exercises::exercises::delivery::{Delivery, DeliveryInsured, DeliveryTrait};
+/// use clean_code_notes_exercises::exercises::delivery_structs::{Delivery, DeliveryInsured, DeliveryTrait};
 /// use clean_code_notes_exercises::exercises::delivery_type::DeliveryType;
 /// use clean_code_notes_exercises::exercises::DeliveryAction;
 ///
@@ -92,7 +92,7 @@ impl DeliveryTrait for DeliveryInsured {
 /// # Example
 ///
 /// ```
-/// use clean_code_notes_exercises::exercises::delivery::{Delivery, DeliveryStandard, DeliveryTrait};
+/// use clean_code_notes_exercises::exercises::delivery_structs::{Delivery, DeliveryStandard, DeliveryTrait};
 /// use clean_code_notes_exercises::exercises::delivery_type::DeliveryType;
 /// use clean_code_notes_exercises::exercises::DeliveryAction;
 ///
