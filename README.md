@@ -14,7 +14,7 @@ Notes and examples of Clean Code.
 ## Exercises
 
 1. [Exercise 1 - Naming](./src/exercises/exercise_01.rs)
-1. [Exercise 2 - Code Structure, Comments & Formatting](./src/exercises/exercise_03.rs)
+1. [Exercise 2 - Code Structure, Comments & Formatting](./src/exercises/exercise_02.rs)
 1. [Exercise 3 - Functions & Methods](./src/exercises/exercise_03.rs)
 1. [Exercise 4 - Control Structures & Errors](./src/exercises/exercise_04.rs)
 1. [Exercise 5 - Objects, Classes & Data Containers / Structures](./src/exercises/exercise_05.rs)
