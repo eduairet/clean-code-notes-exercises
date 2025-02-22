@@ -1,6 +1,4 @@
-use clean_code_notes_exercises::exercises::exercise_05::Delivery::{
-    Delivery, DeliveryExpress, DeliveryInsured, DeliveryStandard, DeliveryTrait,
-};
+use clean_code_notes_exercises::exercises::exercise_05::*;
 
 #[cfg(test)]
 mod exercise_05_test {

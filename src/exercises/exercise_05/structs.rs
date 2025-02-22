@@ -1,2 +1,2 @@
-#[allow(non_snake_case)]
-pub mod Delivery;
+pub mod delivery;
+pub use delivery::*;
